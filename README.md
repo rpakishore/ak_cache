@@ -76,10 +76,20 @@ $ cache_file.write('This is a text')
 $ cache_file.read()
 'This is a text'
 ```
+
+Encrypt your pickle file as below
+
+```python
+$ cache_file = Cache(r'Path\to\Cache\encr_file.pkl', password="Strong_Password")
+
+$ cache_file.write('This is an encrypted text')
+$ cache_file.read()
+'This is an encrypted text'
+```
 <!-- Roadmap -->
 ## 4. Roadmap
 
-- [ ] Add encryption option to the cache file
+- [x] Add encryption option to the cache file
 
 <!-- License -->
 ## 5. License
