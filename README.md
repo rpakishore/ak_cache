@@ -49,7 +49,7 @@
 <!-- Installation -->
 ### 2.2. Installation
 
-Install my-project with npm
+Install my-project with flit
 
 ```bash
 git clone https://github.com/rpakishore/ak_cache.git
