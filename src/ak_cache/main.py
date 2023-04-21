@@ -24,7 +24,7 @@ class Cache:
     
     def _create_cache_file(self, overwrite_existing: bool = False) -> Path:
         if (not self.file.exists()) or overwrite_existing:
-            with open(self.filepath, 'wb') as f:
+            with open(self.filepath, 'wb'):
                 pass
         return self.filepath
     
@@ -43,7 +43,8 @@ class Cache:
         try:
             return cPickle.loads(byte_data)
         except cPickle.UnpicklingError:
-            raise Exception("Cannot Unpickle. Are you sure this is not an encrypted cache file?")
+            raise Exception(
+                "Cannot Unpickle. Are you sure this is not an encrypted cache file?")
             
 
         

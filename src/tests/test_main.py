@@ -1,4 +1,4 @@
-from ak_cache.main import *
+from ak_cache.main import Cache
 from pathlib import Path
 import pytest
 from tempfile import TemporaryDirectory
