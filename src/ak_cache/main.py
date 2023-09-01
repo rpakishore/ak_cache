@@ -7,7 +7,9 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 
 class Cache:
-    def __init__(self, filepath: Path= Path("Cache.pkl"), password: str = None) -> None:
+    def __init__(self, 
+                filepath: Path= Path("Cache.pkl"), 
+                password: str|None = None) -> None:
         self.filepath = Path(str(filepath))
         self.file = ak_file.File(str(filepath))
         self._create_cache_file(overwrite_existing=False)
@@ -15,6 +17,8 @@ class Cache:
             self.f = generate_key(password = password)
         else:
             self.f = None
+            
+        self._cache_content = None
 
     def __str__(self) -> str:
         return f"Cache class located at {self.filepath}"
@@ -30,11 +34,19 @@ class Cache:
     
     def write(self, data) -> Path:
         self._create_cache_file(overwrite_existing = False)
-        byte_data = cPickle.dumps(data)
+        byte_data: bytes = cPickle.dumps(data)
         if self.f:
             byte_data = self.f.encrypt(byte_data)
         _write_bytes_to_file(data=byte_data, filepath = self.filepath)
+        self._cache_content = data
         return self.filepath
+    
+    @property
+    def value(self):
+        if self._cache_content is None:
+            self._cache_content = self.read()
+        
+        return self._cache_content
     
     def read(self):
         byte_data = _read_bytes_from_file(self.filepath)
@@ -46,7 +58,6 @@ class Cache:
             raise Exception(
                 "Cannot Unpickle. Are you sure this is not an encrypted cache file?")
             
-
         
 def _write_bytes_to_file(data: bytes, filepath: Path) -> None:
     with open(filepath, "wb") as f:
