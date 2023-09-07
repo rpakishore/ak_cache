@@ -14,7 +14,7 @@ class Cache:
         self.file: ak_file.File = ak_file.File(str(filepath))
         self._create_cache_file(overwrite_existing=False)
         if password:
-            self.f = generate_key(password = password)
+            self.f = _generate_key(password = password)
         else:
             self.f = None
             
@@ -57,8 +57,6 @@ class Cache:
         except pickle.UnpicklingError:
             raise Exception(
                 "Cannot Unpickle. Are you sure this is not an encrypted cache file?")
-            
-
 
 def _write_bytes_to_file(data: bytes, filepath: Path) -> None:
     with open(filepath, "wb") as f:
@@ -68,7 +66,7 @@ def _read_bytes_from_file(filepath: Path) -> bytes:
     with open(filepath, "rb") as f:
         return f.read()
 
-def generate_key(password: str) -> Fernet:
+def _generate_key(password: str) -> Fernet:
     """
     Generates a key from the given password and returns it.
     """
