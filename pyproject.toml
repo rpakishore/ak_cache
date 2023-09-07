@@ -5,11 +5,17 @@ build-backend = "flit_core.buildapi"
 [project]
 name = "ak_cache"
 authors = [{name = "Arun Kishore", email = "pypi@rpakishore.co.in"}]
+requires-python = ">=3.11.0"
 readme = "README.md"
 license = {file = "LICENSE"}
 classifiers = ["License :: OSI Approved :: MIT License"]
 dynamic = ["version", "description"]
-dependencies = ["ak_file", "pytest", "cryptography"]
+dependencies = ["ak_file", "cryptography"]
+
+[project.optional-dependencies]
+test = [
+    "pytest"
+]
 
 [project.urls]
 Home = "https://github.com/rpakishore/ak_cache"
