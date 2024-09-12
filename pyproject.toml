@@ -10,7 +10,7 @@ readme = "README.md"
 license = {file = "LICENSE"}
 classifiers = ["License :: OSI Approved :: MIT License"]
 dynamic = ["version", "description"]
-dependencies = ["ak_file", "cryptography"]
+dependencies = ["cryptography"]
 
 [project.optional-dependencies]
 test = [

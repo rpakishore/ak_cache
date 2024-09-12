@@ -3,10 +3,12 @@ import pickle
 from pathlib import Path
 from typing import Any
 
-import ak_file
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
+
+# Be careful about changing this Salt value. Changing it can render all existing saved cache useless
+__SALT: bytes = b"salt_^h.W#(e6-OHplcig:?6@+((8{_f2skE"
 
 
 class Cache:
@@ -14,41 +16,38 @@ class Cache:
         self, filepath: Path = Path("Cache.pkl"), password: str | None = None
     ) -> None:
         self.filepath: Path = Path(str(filepath))
-        self.file: ak_file.File = ak_file.File(str(filepath))
-        self._create_cache_file(overwrite_existing=False)
-        if password:
-            self.f = _generate_key(password=password)
-        else:
-            self.f = None
+        if self.filepath.is_dir():
+            self.filepath = self.filepath / "Cache.pkl"
 
+        self._create_cache_file(overwrite_existing=False)
+
+        self.f: Fernet | None = _generate_key(password=password) if password else None
+
+        # Cache the content to prevent repetitive reads
         self._cache_content: Any = None
 
     def __str__(self) -> str:
         return f"Cache class located at {self.filepath}"
 
-    def __repr__(self) -> str:
-        return f"Cache(filepath={self.filepath})"
-
     def _create_cache_file(self, overwrite_existing: bool = False) -> Path:
-        if (not self.file.exists()) or overwrite_existing:
+        """Creates a cache file"""
+        if (not self.filepath.exists()) or overwrite_existing:
             with open(self.filepath, "wb"):
                 pass
         return self.filepath
 
-    def write(self, data: Any) -> Path:
+    def write(self, data: Any) -> None:
         self._create_cache_file(overwrite_existing=False)
         byte_data: bytes = pickle.dumps(data)
         if self.f:
             byte_data = self.f.encrypt(byte_data)
         _write_bytes_to_file(data=byte_data, filepath=self.filepath)
         self._cache_content: Any = data
-        return self.filepath
 
     @property
     def value(self):
         if self._cache_content is None:
             self._cache_content: Any = self.read()
-
         return self._cache_content
 
     def read(self) -> Any:
@@ -74,11 +73,9 @@ def _read_bytes_from_file(filepath: Path) -> bytes:
 
 
 def _generate_key(password: str) -> Fernet:
-    """
-    Generates a key from the given password and returns it.
-    """
+    """Generates a Fernet key from the given password and returns it."""
     password_bytes = bytes(password, "utf-8")
-    salt = b"salt_^h.W#(e6-OHplcig:?6@+((8{_f2skE"
+    salt = __SALT
     kdf = PBKDF2HMAC(
         algorithm=hashes.SHA256(),
         length=32,
